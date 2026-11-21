@@ -38,7 +38,6 @@ const PILLARS = [
   },
 ];
 
-/* Giant outlined words that drift slowly behind the cards */
 const BG_ROW_ONE = 'LEARN · BUILD · SHIP · ';
 const BG_ROW_TWO = 'DEPLOY · SCALE · INNOVATE · ';
 
@@ -58,7 +57,6 @@ function DriftingText({
   className: string;
   reduce: boolean | null;
 }) {
-  // Text is repeated so the loop of -50% is seamless
   const content = text.repeat(6);
   return (
     <motion.div
@@ -72,7 +70,6 @@ function DriftingText({
   );
 }
 
-/* Moves a soft green spotlight with the cursor inside a card */
 function trackSpotlight(e: MouseEvent<HTMLDivElement>) {
   const rect = e.currentTarget.getBoundingClientRect();
   e.currentTarget.style.setProperty('--mx', `${e.clientX - rect.left}px`);
@@ -84,9 +81,7 @@ export function WhyJoinSection() {
 
   return (
     <section className="relative overflow-hidden border-b border-[#151B24]/10 bg-[#F5F7F6] py-8 dark:border-white/10 dark:bg-[#151B24] sm:py-10">
-      {/* ---------- Background layers ---------- */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        {/* Drifting giant text, fades out at top and bottom */}
         <div className="absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]">
           <DriftingText
             text={BG_ROW_ONE}
@@ -103,7 +98,6 @@ export function WhyJoinSection() {
           />
         </div>
 
-        {/* Light line grid */}
         <motion.div
           className="absolute inset-0 text-[#151B24]/[0.05] dark:text-white/[0.04] [mask-image:radial-gradient(ellipse_at_center,black_15%,transparent_70%)]"
           style={{
@@ -115,7 +109,6 @@ export function WhyJoinSection() {
           transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
         />
 
-        {/* Soft glows */}
         <motion.div
           className="absolute -top-24 -right-24 h-[300px] w-[300px] rounded-full bg-[#00E582]/15 blur-[110px] dark:bg-[#00E582]/10"
           animate={reduce ? undefined : { x: [0, -50, 0], y: [0, 40, 0] }}
@@ -128,7 +121,6 @@ export function WhyJoinSection() {
         />
       </div>
 
-      {/* ---------- Content ---------- */}
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 28 }}
@@ -159,7 +151,6 @@ export function WhyJoinSection() {
                 data-cursor="card"
                 className="group relative flex flex-col justify-between overflow-hidden rounded-lg border border-[#151B24]/12 bg-white/90 p-5 shadow-sm backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-[#00E582]/70 hover:shadow-[0_28px_60px_-22px_rgba(0,229,130,0.45)] dark:border-white/12 dark:bg-[#1A222D]/90 sm:p-6"
               >
-                {/* Cursor-following spotlight */}
                 <div
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -168,14 +159,11 @@ export function WhyJoinSection() {
                       'radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%), rgba(0,229,130,0.14), transparent 60%)',
                   }}
                 />
-
-                {/* Accent line that sweeps across the top on hover */}
                 <span
                   aria-hidden="true"
                   className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-[#00E582] to-[#3B82F6] transition-transform duration-500 group-hover:scale-x-100"
                 />
 
-                {/* Oversized outlined number */}
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute -right-1 -top-2 select-none font-serif text-[4.5rem] font-semibold leading-none text-transparent transition-all duration-500 [-webkit-text-stroke:1px_rgba(21,27,36,0.14)] group-hover:text-[#00E582]/15 group-hover:[-webkit-text-stroke:1px_rgba(0,229,130,0.7)] dark:[-webkit-text-stroke:1px_rgba(255,255,255,0.14)]"

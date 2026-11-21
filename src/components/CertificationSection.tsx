@@ -2,9 +2,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Award, BookOpen } from 'lucide-react';
 import { ResilientImage } from './ResilientImage';
 
-/* ------------------------------------------------------------------ */
-/* Edit this array to add, remove or change courses. One entry = one card. */
-/* ------------------------------------------------------------------ */
+
 const COURSES = [
   {
     id: 'clf-c02',
@@ -50,7 +48,6 @@ export function CertificationSection() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* ---------- Centered heading ---------- */}
         <motion.div
           className="mx-auto max-w-3xl text-center"
           initial={reduce ? false : { opacity: 0, y: 28 }}
@@ -82,7 +79,6 @@ export function CertificationSection() {
               transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="group relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-white/70 bg-white/65 p-3 shadow-[0_16px_48px_-24px_rgba(21,27,36,0.3)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 hover:border-[#00E582]/70 hover:shadow-[0_24px_56px_-24px_rgba(0,229,130,0.45)] dark:border-white/15 dark:bg-[#151B24]/70 sm:p-4"
             >
-              {/* top accent line */}
               <div
                 aria-hidden="true"
                 className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00E582] to-transparent"

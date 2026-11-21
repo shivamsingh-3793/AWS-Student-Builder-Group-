@@ -7,7 +7,6 @@ export function FinalCTA({ onOpenJoin }: { onOpenJoin: () => void }) {
 
   return (
     <section className="relative bg-[#00E582] text-[#151B24] py-24 sm:py-32 overflow-hidden">
-      {/* Subtle geometric pattern on #00E582 */}
       <motion.div
         aria-hidden="true"
         animate={

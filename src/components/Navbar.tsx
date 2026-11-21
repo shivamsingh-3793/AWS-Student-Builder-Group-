@@ -54,7 +54,7 @@ export function Navbar({ onOpenJoin }: { onOpenJoin: () => void }) {
 
   const isHomeTop = location.pathname === '/' && !scrolled;
 
-  // Scroll detect: neeche scroll karne par hide karega, upar scroll karne par show karega
+  
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -62,10 +62,10 @@ export function Navbar({ onOpenJoin }: { onOpenJoin: () => void }) {
       setScrolled(currentScrollY > 20);
 
       if (currentScrollY > lastScrollY.current && currentScrollY > 70) {
-        // Scroll down -> navbar hat jayega
+        
         setVisible(false);
       } else {
-        // Scroll up ya top par -> navbar wapas aa jayega
+       
         setVisible(true);
       }
 
@@ -87,7 +87,7 @@ export function Navbar({ onOpenJoin }: { onOpenJoin: () => void }) {
     };
   }, [mobileOpen]);
 
-  // Full-width surface styling (Floating rounded pill styling removed)
+
   const navSurface = isHomeTop
     ? 'bg-white/[0.05] border-b border-white/15'
     : 'bg-white/90 dark:bg-[#151B24]/90 border-b border-slate-200/80 dark:border-white/10 shadow-sm';

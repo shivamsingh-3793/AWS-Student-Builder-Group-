@@ -112,7 +112,6 @@ export function TeamProfileCard({
         featured ? 'grid md:grid-cols-[minmax(0,320px)_1fr]' : 'flex flex-col'
       }`}
     >
-      {/* Background AWS Architectural Grid */}
       <svg
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 h-full w-full text-slate-900/[0.05] dark:text-[#00E582]/[0.09] transition-opacity duration-300 group-hover:opacity-100"
@@ -125,14 +124,13 @@ export function TeamProfileCard({
           <pattern id={cardGridId} width="28" height="28" patternUnits="userSpaceOnUse">
             {/* Grid Square */}
             <path d="M 28 0 L 0 0 0 28" fill="none" stroke="currentColor" strokeWidth="0.8" />
-            {/* AWS Architecture Intersection Crosshair */}
             <path d="M 0 -2 L 0 2 M -2 0 L 2 0" stroke="currentColor" strokeWidth="1" />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill={`url(#${cardGridId})`} />
       </svg>
 
-      {/* Hover Ambient Corner Glow */}
+
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(0,229,130,0.16),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -144,7 +142,6 @@ export function TeamProfileCard({
       />
 
       <div className={`relative z-10 flex flex-1 flex-col ${featured ? 'justify-center p-6 sm:p-8 lg:p-10' : 'p-5'}`}>
-        {/* AWS Watermark */}
         <span
           aria-hidden="true"
           className="pointer-events-none absolute top-4 right-4 font-mono text-[9px] font-semibold tracking-wider text-slate-300 dark:text-slate-600 select-none"

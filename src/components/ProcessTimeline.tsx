@@ -95,14 +95,14 @@ export function ProcessTimeline() {
           subtitle="Four deliberate stages take every new member from first cloud sandbox deploy to shipping open-source systems."
         />
 
-        {/* Timeline Container */}
+        
         <div className="mt-20 relative">
-          {/* Desktop horizontal continuous connector track */}
+          
           <div
             aria-hidden="true"
             className="hidden lg:block absolute top-[14px] left-6 right-6 h-[2px] bg-[#151B24]/10 dark:bg-white/10 overflow-hidden"
           >
-            {/* Animated energetic laser pulse along the line */}
+            
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: '250%' }}
@@ -115,7 +115,7 @@ export function ProcessTimeline() {
             />
           </div>
 
-          {/* Mobile vertical continuous connector line */}
+          
           <div
             aria-hidden="true"
             className="lg:hidden absolute left-4 top-2 bottom-6 w-[2px] bg-gradient-to-b from-[#00E582] via-[#00E582]/40 to-[#151B24]/10 dark:to-white/10"
@@ -137,12 +137,10 @@ export function ProcessTimeline() {
                   }}
                   className="group relative pl-12 lg:pl-0 lg:pt-12"
                 >
-                  {/* Node marker with active radar ping */}
+                  
                   <div className="absolute left-4 -translate-x-1/2 top-2 lg:left-6 lg:-translate-x-1/2 lg:top-[14px] lg:-translate-y-1/2 z-10">
                     <div className="relative flex items-center justify-center w-7 h-7 rounded-full bg-white dark:bg-[#151B24] border-2 border-[#151B24]/20 dark:border-white/20 group-hover:border-[#00E582] group-hover:shadow-[0_0_18px_rgba(0,229,130,0.6)] transition-all duration-300">
-                      {/* Outer pulse wave */}
                       <span className="absolute inset-0 rounded-full bg-[#00E582] opacity-0 group-hover:opacity-100 group-hover:animate-ping pointer-events-none" />
-                      {/* Inner solid beacon */}
                       <span className="w-2 h-2 rounded-full bg-[#008F52] dark:bg-[#00E582] transition-transform duration-300 group-hover:scale-125" />
                     </div>
                   </div>
@@ -153,7 +151,6 @@ export function ProcessTimeline() {
                     transition={{ duration: 0.25, ease: 'easeOut' }}
                     className="relative flex flex-col justify-between h-full rounded-2xl bg-white/80 dark:bg-[#151B24]/90 backdrop-blur-md border border-[#151B24]/10 dark:border-white/10 p-6 shadow-sm hover:shadow-2xl hover:shadow-[#00E582]/10 hover:border-[#00E582]/70 dark:hover:border-[#00E582]/70 transition-all duration-300 overflow-hidden"
                   >
-                    {/* Background oversized step watermark */}
                     <span
                       aria-hidden="true"
                       className="absolute -right-2 -top-3 font-mono text-7xl font-black text-[#151B24]/5 dark:text-white/[0.03] select-none pointer-events-none group-hover:text-[#00E582]/10 transition-colors duration-300"
@@ -176,7 +173,6 @@ export function ProcessTimeline() {
                         </div>
                       </div>
 
-                      {/* Phase sub-label & Title */}
                       <p className="font-mono text-xs font-semibold uppercase tracking-wider text-[#008F52] dark:text-[#00E582]/80 mb-1">
                         {stage.phaseLabel}
                       </p>
@@ -189,7 +185,6 @@ export function ProcessTimeline() {
                       </p>
                     </div>
 
-                    {/* Footer Deliverable Tags */}
                     <div className="mt-6 pt-4 border-t border-[#151B24]/5 dark:border-white/5 flex flex-wrap gap-1.5">
                       {stage.tags.map((tag) => (
                         <span

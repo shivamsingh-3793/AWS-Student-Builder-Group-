@@ -22,14 +22,12 @@ export function TeamSection() {
     );
   }, [members]);
 
-  // Active categories that actually have members
   const availableGroups = useMemo(() => {
     return TEAM_GROUPS.filter((group) =>
       sortedMembers.some((m) => m.category === group.category),
     );
   }, [sortedMembers]);
 
-  // Filtered members based on active tab and search query
   const filteredMembers = useMemo(() => {
     return sortedMembers.filter((member) => {
       const matchesCategory =
@@ -47,9 +45,7 @@ export function TeamSection() {
 
   return (
     <section className="relative overflow-hidden border-b border-[#151B24]/10 bg-[#F8FAFC] py-24 dark:border-white/10 dark:bg-[#0F141C] sm:py-32">
-      {/* Background: AWS Architecture Blueprint Grid + Ambient Cloud Glows */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        {/* Crisp SVG Technical Blueprint Grid */}
         <svg
           className="absolute inset-0 h-full w-full text-slate-900/[0.04] dark:text-[#00E582]/[0.05]"
           style={{
@@ -60,14 +56,12 @@ export function TeamSection() {
           <defs>
             <pattern id={bgGridId} width="48" height="48" patternUnits="userSpaceOnUse">
               <path d="M 48 0 L 0 0 0 48" fill="none" stroke="currentColor" strokeWidth="0.8" />
-              {/* Intersection Coordinate Crosshair */}
               <path d="M 0 -3 L 0 3 M -3 0 L 3 0" stroke="currentColor" strokeWidth="1" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill={`url(#${bgGridId})`} />
         </svg>
 
-        {/* Floating AWS Soft Glows */}
         <motion.div
           className="absolute -top-32 -right-24 h-[460px] w-[460px] rounded-full bg-[#00E582]/12 blur-[120px] dark:bg-[#00E582]/10"
           animate={reduce ? undefined : { x: [0, -35, 0], y: [0, 30, 0] }}
@@ -81,7 +75,6 @@ export function TeamSection() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Top Header & Telemetry Bar */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 24 }}
@@ -98,7 +91,6 @@ export function TeamSection() {
             />
           </motion.div>
 
-          {/* AWS Cloud Architecture Telemetry Badge */}
           <motion.div
             initial={reduce ? false : { opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -116,7 +108,6 @@ export function TeamSection() {
           </motion.div>
         </div>
 
-        {/* Interactive Filter Pills & Search Bar */}
         {!loading && !error && sortedMembers.length > 0 && (
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 14 }}
@@ -276,7 +267,6 @@ export function TeamSection() {
               })}
             </div>
           ) : (
-            /* Filtered Single Grid View */
             <motion.div
               layout
               className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"

@@ -67,7 +67,6 @@ export function TestimonialsSection() {
 
   return (
     <section className="relative overflow-hidden border-b border-[#151B24]/10 bg-white py-12 dark:border-white/10 dark:bg-[#1A222D] sm:py-16">
-      {/* Background: faint drifting line grid + soft glows */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <motion.div
           className="absolute inset-0 text-[#151B24]/[0.06] dark:text-white/[0.05] [mask-image:radial-gradient(ellipse_at_center,black_15%,transparent_70%)]"
@@ -126,7 +125,6 @@ export function TestimonialsSection() {
           aria-roledescription="carousel"
           className="relative mt-7 overflow-hidden rounded-2xl border border-white/70 bg-white/70 p-5 shadow-[0_16px_48px_-24px_rgba(21,27,36,0.3)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 hover:border-[#00E582]/60 hover:shadow-[0_28px_60px_-22px_rgba(0,229,130,0.4)] dark:border-white/15 dark:bg-[#151B24]/70 sm:p-7"
         >
-          {/* Oversized decorative quote mark */}
           <span
             aria-hidden="true"
             className="pointer-events-none absolute -top-4 right-5 select-none font-serif text-[9rem] leading-none text-[#00E582]/20"

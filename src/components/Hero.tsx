@@ -60,7 +60,6 @@ export function Hero({
         className="absolute inset-0 blueprint-grid [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
       />
 
-      {/* Soft colour glows. They sit behind the glass so the blur has something to catch. */}
       <motion.div
         aria-hidden="true"
         animate={prefersReduced ? undefined : { x: [0, 30, 0], y: [0, -20, 0] }}

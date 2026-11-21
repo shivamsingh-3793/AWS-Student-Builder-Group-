@@ -67,7 +67,7 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
         ))}
       </div>
 
-      {/* Fullscreen Accessible Lightbox */}
+
       <AnimatePresence>
         {activeItem && (
           <motion.div
