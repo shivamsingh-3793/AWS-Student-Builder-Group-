@@ -9,6 +9,8 @@ export default defineConfig(() => {
   const rootDir = fileURLToPath(new URL('.', import.meta.url));
 
   return {
+    envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
+
     plugins: [
       react(),
       tailwindcss(),

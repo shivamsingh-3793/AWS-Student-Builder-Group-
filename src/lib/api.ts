@@ -12,7 +12,11 @@ import type {
 } from '../types';
 
 const API_BASE =
-  (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || '';
+  (
+    (import.meta.env.VITE_API_URL as string | undefined) ||
+    (import.meta.env.NEXT_PUBLIC_API_URL as string | undefined) ||
+    ''
+  ).replace(/\/$/, '');
 
 const TOKEN_STORAGE_KEY = 'stratus_admin_token';
 let legacyTokenCleared = false;

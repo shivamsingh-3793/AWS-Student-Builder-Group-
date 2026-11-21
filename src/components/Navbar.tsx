@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, Menu, Moon, Sun, X } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import brandLogo from '../assets/images/aws-student-builder-group-logo.jpeg';
+import brandLogo from '../assets/images/AWS_logo.jpeg';
 
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
