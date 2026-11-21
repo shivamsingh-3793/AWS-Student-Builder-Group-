@@ -1,0 +1,8 @@
+{
+  "name": "Stratus Builders — AWS Cloud Engineering Community",
+  "description": "A student-led AWS cloud engineering community learning distributed systems, serverless architecture, and DevOps by building and shipping real production projects together.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

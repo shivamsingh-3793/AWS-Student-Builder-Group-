@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-canvas: #F5F7F6;
+    --bg-surface: #FFFFFF;
+    --bg-elevated: #EDF1EF;
+    --text-primary: #151B24;
+    --text-secondary: #475569;
+    --border-subtle: rgba(21, 27, 36, 0.1);
+    --brand-green: #00E582;
+    --brand-dark: #151B24;
+  }
+
+  .dark {
+    --bg-canvas: #151B24;
+    --bg-surface: #1A222D;
+    --bg-elevated: #202A37;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --border-subtle: rgba(255, 255, 255, 0.09);
+    --brand-green: #00E582;
+    --brand-dark: #151B24;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  html, body {
+    cursor: default;
+  }
+
+  a[href],
+  button:not(:disabled),
+  [role="button"],
+  input[type="button"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="reset"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Blueprint grid background utility */
+.blueprint-grid {
+  background-size: 48px 48px;
+  background-image:
+    linear-gradient(to right, rgba(0, 229, 130, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 130, 0.06) 1px, transparent 1px);
+}
+
+.blueprint-grid-light {
+  background-size: 48px 48px;
+  background-image:
+    linear-gradient(to right, rgba(21, 27, 36, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(21, 27, 36, 0.05) 1px, transparent 1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Custom thin scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 130, 0.25);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 130, 0.5);
+}
