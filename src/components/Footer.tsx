@@ -25,10 +25,10 @@ const EXPLORE_LINKS: ExploreLink[] = [
 ];
 
 const SOCIALS = [
-  { label: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin },
-  { label: 'Instagram', href: 'https://instagram.com', icon: Instagram },
-  { label: 'WhatsApp', href: '#', icon: MessageCircle },
-  { label: 'Meetup', href: '#', icon: CalendarDays },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/aws-student-builder-group-at-igc', icon: Linkedin },
+  { label: 'Instagram', href: 'https://www.instagram.com/aws.sbg.igc?lqvp=MTRsMDl1bXYxbW00dQ==', icon: Instagram },
+  { label: 'WhatsApp', href: 'https://chat.whatsapp.com/DZZ5x5uiPVpIsdcLy6NIv8', icon: MessageCircle },
+  { label: 'Meetup', href: 'https://www.meetup.com/aws-sbg-at-indo-global-group-of-colleges', icon: CalendarDays },
 ];
 
 const CONTACT_DETAILS = [
