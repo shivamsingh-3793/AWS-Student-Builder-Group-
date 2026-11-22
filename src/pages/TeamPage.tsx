@@ -15,8 +15,9 @@ export function TeamPage() {
   return (
     <>
       <SeoHead
-        title="Our Team"
-        description="Meet the people building and growing the AWS Student Builder Group at IGC."
+        title="AWS Student Builder Group Team | Punjab AWS Student Community"
+        description="Meet the student leaders and builders growing the AWS student community at Indo Global Group of Colleges in Punjab."
+        canonicalPath="/team"
       />
 
       <section className="relative overflow-hidden border-b border-white/10 bg-[#151B24] pb-16 pt-32 text-white blueprint-grid sm:pb-20">

@@ -142,8 +142,9 @@ export function ContactPage() {
   return (
     <>
       <SeoHead
-        title="Contact & Partner"
-        description="Get in touch with AWS Student Builder Group to join a squad, propose a technical workshop, or partner on student hackathons."
+        title="Contact AWS Student Builder Group | Punjab"
+        description="Contact the AWS Student Builder Group in Punjab to join the community, propose a workshop or collaborate on a student event."
+        canonicalPath="/contact"
       />
 
       {/* ================= HERO SECTION ================= */}

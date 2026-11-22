@@ -210,8 +210,9 @@ export function GalleryPage() {
   return (
     <>
       <SeoHead
-        title="Gallery"
-        description="Moments from workshops, build sprints, hackathons and community events at AWS Student Builder Group."
+        title="Community Gallery | AWS Student Builder Group Punjab"
+        description="Photos from AWS workshops, build sprints, meetups and community events with students at Indo Global Group of Colleges."
+        canonicalPath="/gallery"
       />
 
       <main className="bg-[#F5F7F6] dark:bg-[#151B24] min-h-screen pt-28 sm:pt-32 pb-24 px-3 sm:px-6">

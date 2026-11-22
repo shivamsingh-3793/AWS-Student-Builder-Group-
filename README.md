@@ -101,9 +101,10 @@ node -e "console.log(require('node:crypto').randomBytes(48).toString('hex'))"
 ```
 
 For an existing Supabase database, apply `supabase/security-hardening.sql` before
-deploying the server. It adds server-only session and audit-log tables, with RLS
-enabled and access granted only to `service_role`. For a new database, use the
-updated `supabase/schema.sql`. Configure `NODE_ENV=production` in the deployment
+deploying the server. Apply `supabase/community-submissions.sql` as well to add
+the admin-only submission status and paginated inbox query without changing or
+deleting existing submissions. For a new database, use the updated
+`supabase/schema.sql`. Configure `NODE_ENV=production` in the deployment
 environment and terminate HTTPS at a trusted proxy; set `TRUST_PROXY_HOPS` to
 that proxy count so secure headers and client IP rate limits work as intended.
 

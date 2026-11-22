@@ -4,6 +4,7 @@ import express from 'express';
 import type { AddressInfo } from 'node:net';
 import type { Server } from 'node:http';
 import jwt from 'jsonwebtoken';
+import { InputValidationError } from './validation.ts';
 
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-only-secret-that-is-long-enough-for-auth-tests';
@@ -11,12 +12,48 @@ process.env.SUPABASE_URL = 'https://example.supabase.co';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
 const nativeFetch = globalThis.fetch.bind(globalThis);
 let communityStatsRow: Record<string, unknown> | null = null;
+let storedSubmissions: Array<Record<string, unknown>> = [];
+let lastSubmissionQuery: Record<string, unknown> | null = null;
+let submissionRpcError: { code: string; message: string } | null = null;
 const testAdminSessionId = '00000000-0000-4000-8000-000000000001';
+
+function testAdminToken(): string {
+  return jwt.sign(
+    { id: 1, email: 'admin@example.com', name: 'Admin', role: 'admin', jti: testAdminSessionId },
+    process.env.JWT_SECRET!,
+    {
+      algorithm: 'HS256',
+      issuer: 'stratus-cms',
+      audience: 'stratus-admin',
+      expiresIn: 3600,
+    },
+  );
+}
+
 globalThis.fetch = async (input, init) => {
   const url = new URL(input instanceof Request ? input.url : input.toString());
   if (url.origin === 'https://example.supabase.co') {
     const method = init?.method || (input instanceof Request ? input.method : 'GET');
     const headers = new Headers(init?.headers || (input instanceof Request ? input.headers : undefined));
+    if (url.pathname.endsWith('/rpc/admin_list_submissions') && method === 'POST') {
+      if (submissionRpcError) {
+        return new Response(JSON.stringify(submissionRpcError), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      const body = init?.body;
+      if (typeof body === 'string') lastSubmissionQuery = JSON.parse(body) as Record<string, unknown>;
+      const offset = Number(lastSubmissionQuery?.p_offset) || 0;
+      const limit = Number(lastSubmissionQuery?.p_limit) || 25;
+      return new Response(JSON.stringify({
+        submissions: storedSubmissions.slice(offset, offset + limit),
+        total: storedSubmissions.length,
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
     if (url.pathname.endsWith('/community_stats')) {
       if (method === 'POST') {
         const body = init?.body;
@@ -51,7 +88,33 @@ globalThis.fetch = async (input, init) => {
       });
     }
     if (url.pathname.endsWith('/submissions') && method === 'POST') {
+      const body = init?.body;
+      if (typeof body === 'string') {
+        storedSubmissions.push({
+          id: storedSubmissions.length + 1,
+          ...JSON.parse(body) as Record<string, unknown>,
+          status: 'new',
+          created_at: new Date().toISOString(),
+        });
+      }
       return new Response(null, { status: 201 });
+    }
+    if (url.pathname.endsWith('/submissions') && method === 'PATCH') {
+      const body = init?.body;
+      const update = typeof body === 'string' ? JSON.parse(body) as { status: string } : null;
+      const id = Number(url.searchParams.get('id')?.replace('eq.', ''));
+      const submission = storedSubmissions.find((row) => row.id === id);
+      if (!submission || !update) {
+        return new Response(JSON.stringify({ message: 'Not found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      submission.status = update.status;
+      return new Response(JSON.stringify({ id, status: submission.status }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
     return new Response('[]', {
       status: 200,
@@ -90,7 +153,8 @@ before(async () => {
   app.use('/api/community', community.default);
   app.get('/public-probe', authMiddleware.optionalAuth, (_req, res) => res.sendStatus(200));
   app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    res.status(500).json({ error: error instanceof Error ? error.message : 'Unexpected test error.' });
+    const status = error instanceof InputValidationError ? 400 : 500;
+    res.status(status).json({ error: error instanceof Error ? error.message : 'Unexpected test error.' });
   });
 
   server = await new Promise<Server>((resolve) => {
@@ -125,6 +189,7 @@ test('unauthenticated requests cannot mutate CMS content or read submissions', a
     ['DELETE', '/api/team/1'],
     ['PUT', '/api/stats'],
     ['GET', '/api/community/submissions'],
+    ['PATCH', '/api/community/submissions/1/status'],
     ['GET', '/api/events?all=true'],
     ['GET', '/api/team?all=true'],
     ['GET', '/api/auth/me'],
@@ -197,21 +262,145 @@ test('public event listing and contact submission remain available', async () =>
   assert.equal(contactResponse.status, 201, await contactResponse.clone().text());
 });
 
+test('application and contact messages are stored completely without trimming', async () => {
+  storedSubmissions = [];
+  const messages = [
+    'A short application.',
+    'x'.repeat(320),
+    'x'.repeat(650),
+    '  Keep leading and trailing text.\n',
+    `Very long application:\n${'A complete line of applicant text.\n'.repeat(2500)}`,
+  ];
+
+  for (const message of messages) {
+    const response = await fetch(`${baseUrl}/api/community/join`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Long Message User',
+        email: 'long-message@example.com',
+        message,
+      }),
+    });
+    assert.equal(response.status, 201, await response.clone().text());
+    assert.equal(storedSubmissions.at(-1)?.message, message);
+  }
+
+  const contactMessage = `Contact details:\n${'Additional context. '.repeat(3000)}`;
+  const contactResponse = await fetch(`${baseUrl}/api/community/contact`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'Contact User',
+      email: 'contact-long@example.com',
+      message: contactMessage,
+    }),
+  });
+  assert.equal(contactResponse.status, 201, await contactResponse.clone().text());
+  assert.equal(storedSubmissions.at(-1)?.message, contactMessage);
+});
+
+test('admin submissions are paginated and searchable through the protected API', async () => {
+  storedSubmissions = Array.from({ length: 31 }, (_, index) => ({
+    id: index + 1,
+    kind: 'event_rsvp',
+    name: `RSVP User ${index + 1}`,
+    email: `rsvp${index + 1}@example.com`,
+    role: 'Attendee',
+    track: 'Cloud',
+    message: 'Looking forward to AWS Launchpad.',
+    event_id: 3,
+    event_title: 'AWS Launchpad',
+    status: 'read',
+    created_at: '2026-11-20T10:00:00.000Z',
+  }));
+  lastSubmissionQuery = null;
+
+  const response = await fetch(
+    `${baseUrl}/api/community/submissions?page=2&pageSize=10&sort=oldest&kind=event_rsvp&status=read&search=Launchpad`,
+    { headers: { Authorization: `Bearer ${testAdminToken()}` } },
+  );
+  assert.equal(response.status, 200, await response.clone().text());
+  const result = await response.json();
+  assert.equal(result.total, 31);
+  assert.equal(result.page, 2);
+  assert.equal(result.submissions.length, 10);
+  assert.equal(result.hasMore, true);
+  assert.deepEqual(lastSubmissionQuery, {
+    p_kind: 'event_rsvp',
+    p_status: 'read',
+    p_search: 'Launchpad',
+    p_sort: 'oldest',
+    p_limit: 10,
+    p_offset: 10,
+  });
+});
+
+test('submission query failures are logged safely and return JSON without exposing details', async () => {
+  submissionRpcError = {
+    code: 'PGRST202',
+    message: 'Could not find the function public.admin_list_submissions in the schema cache.',
+  };
+  const originalConsoleError = console.error;
+  const logged: unknown[][] = [];
+  console.error = (...args: unknown[]) => logged.push(args);
+
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}/api/community/submissions`, {
+      headers: { Authorization: `Bearer ${testAdminToken()}` },
+    });
+  } finally {
+    console.error = originalConsoleError;
+    submissionRpcError = null;
+  }
+
+  assert.equal(response!.status, 500);
+  assert.deepEqual(await response!.json(), { error: 'Unable to load community submissions.' });
+  assert.match(JSON.stringify(logged), /PGRST202/);
+  assert.match(JSON.stringify(logged), /admin_list_submissions/);
+  assert.doesNotMatch(JSON.stringify(logged), /message content|private submission/i);
+});
+
+test('only authenticated admins can change submission status', async () => {
+  storedSubmissions = [{ id: 12, status: 'new' }];
+
+  const unauthorized = await fetch(`${baseUrl}/api/community/submissions/12/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'read' }),
+  });
+  assert.equal(unauthorized.status, 401);
+
+  const invalid = await fetch(`${baseUrl}/api/community/submissions/12/status`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${testAdminToken()}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: 'deleted' }),
+  });
+  assert.equal(invalid.status, 400);
+
+  const response = await fetch(`${baseUrl}/api/community/submissions/12/status`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${testAdminToken()}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: 'reviewed' }),
+  });
+  assert.equal(response.status, 200, await response.clone().text());
+  assert.equal((await response.json()).submission.status, 'reviewed');
+  assert.equal(storedSubmissions[0].status, 'reviewed');
+});
+
 test('community statistics save through the admin API and are returned for public display', async () => {
   communityStatsRow = null;
   const emptyResponse = await fetch(`${baseUrl}/api/stats`);
   assert.deepEqual(await emptyResponse.json(), { community: null });
 
-  const token = jwt.sign(
-    { id: 1, email: 'admin@example.com', name: 'Admin', role: 'admin', jti: testAdminSessionId },
-    process.env.JWT_SECRET!,
-    {
-      algorithm: 'HS256',
-      issuer: 'stratus-cms',
-      audience: 'stratus-admin',
-      expiresIn: 3600,
-    },
-  );
+  const token = testAdminToken();
   const stats = {
     builders_count: 601,
     events_count: 72,

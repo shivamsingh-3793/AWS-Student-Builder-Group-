@@ -22,21 +22,15 @@ import { FinalCTA } from '../components/FinalCTA';
 import { CertificationSection } from '../components/CertificationSection';
 import { EmptyState, ErrorBanner, LoadingGrid } from '../components/StateFeedback';
 
-/* ------------------------------------------------------------------ */
-/* Small building blocks used only on this page                        */
-/* ------------------------------------------------------------------ */
 
-/**
- * Hover effect for any grid of cards. It only touches box-shadow and filter,
- * so it cannot clash with the cards' own layout or motion transforms:
- * the hovered card gets a green glow and its neighbours dim slightly.
- */
+
+
 const cardHover =
   'group/grid [&>*]:rounded-lg [&>*]:overflow-hidden [&>*]:transition-[box-shadow,filter] [&>*]:duration-300 ' +
   '[&>*:hover]:shadow-[0_28px_60px_-22px_rgba(0,229,130,0.45)] ' +
   'group-hover/grid:[&>*:not(:hover)]:brightness-95 dark:group-hover/grid:[&>*:not(:hover)]:brightness-75';
 
-/** Fades and lifts its children into view the first time they are scrolled to. */
+
 function Reveal({
   children,
   delay = 0,
@@ -60,7 +54,7 @@ function Reveal({
   );
 }
 
-/** 'lines' = faint blueprint grid (matches the hero), 'dots' = the earlier dot pattern. */
+
 const BACKDROP_GRID: 'lines' | 'dots' = 'lines';
 
 const gridStyle =
@@ -125,7 +119,6 @@ function Section({
   );
 }
 
-/** Pill link whose green fill sweeps in from the left on hover. */
 function ArrowLink({ to, label }: { to: string; label: string }) {
   return (
     <Link
@@ -155,7 +148,7 @@ function SectionHeader({
   );
 }
 
-/** Thin progress line at the very top of the viewport that fills as you scroll. */
+
 function ScrollProgress() {
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll();
@@ -170,9 +163,7 @@ function ScrollProgress() {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
+
 
 export function HomePage({ onOpenJoin }: { onOpenJoin: () => void }) {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -218,8 +209,30 @@ export function HomePage({ onOpenJoin }: { onOpenJoin: () => void }) {
   return (
     <>
       <SeoHead
-        title="Learn. Build. Innovate."
-        description="AWS Student Builder Group is an AWS student and cloud engineering community learning distributed systems, serverless architecture, and DevOps by building real projects."
+        title="AWS Student Builder Group | AWS Student Community Punjab"
+        description="AWS Student Builder Group at Indo Global Group of Colleges, Punjab — learn AWS, build cloud projects, join student events and meetups, and grow with a community of student builders."
+        canonicalPath="/"
+        type="website"
+        structuredData={[
+          {
+            '@type': 'Organization',
+            name: 'AWS Student Builder Group',
+            url: 'https://aws-student-builder-group-tau.vercel.app/',
+            logo: 'https://aws-student-builder-group-tau.vercel.app/src/assets/images/AWS_logo.jpeg',
+            description: 'An independent student community at Indo Global Group of Colleges focused on AWS learning, cloud projects, workshops and meetups.',
+            sameAs: [
+              'https://www.linkedin.com/company/aws-student-builder-group-at-igc',
+              'https://www.instagram.com/aws.sbg.igc',
+              'https://chat.whatsapp.com/DZZ5x5uiPVpIsdcLy6NIv8',
+              'https://www.meetup.com/aws-sbg-at-indo-global-group-of-colleges'
+            ]
+          },
+          {
+            '@type': 'WebSite',
+            name: 'AWS Student Builder Group',
+            url: 'https://aws-student-builder-group-tau.vercel.app/'
+          }
+        ]}
       />
 
       <ScrollProgress />
@@ -295,7 +308,6 @@ export function HomePage({ onOpenJoin }: { onOpenJoin: () => void }) {
         </div>
       </Section>
 
-      {/* Engineering journal */}
       <Section className="bg-[#F5F7F6] dark:bg-[#151B24]" side="right">
         <SectionHeader
           index="05. Engineering Journal"

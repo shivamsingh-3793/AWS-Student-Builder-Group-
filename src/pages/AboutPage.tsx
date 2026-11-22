@@ -10,8 +10,9 @@ export function AboutPage({ onOpenJoin }: { onOpenJoin: () => void }) {
   return (
     <>
       <SeoHead
-        title="About the Community"
-        description="Learn how AWS Student Builder Group trains student cloud engineers through hands-on AWS labs, open-source squads, and mentorship."
+        title="About AWS Student Builder Group | AWS Community Punjab"
+        description="Learn about the AWS Student Builder Group at Indo Global Group of Colleges, Punjab and its workshops, projects and community activities."
+        canonicalPath="/about"
       />
 
       <section className="pt-32 pb-20 bg-[#151B24] text-white blueprint-grid border-b border-white/10">
@@ -67,8 +68,8 @@ export function AboutPage({ onOpenJoin }: { onOpenJoin: () => void }) {
 
           <div className="lg:col-span-6 border border-[#151B24]/12 dark:border-white/12 overflow-hidden bg-[#151B24] aspect-[4/3]">
             <ResilientImage
-              src="/src/assets/images/gallery_community_workshop_1794995100654.jpg"
-              alt="AWS Student Builder Group members designing cloud architecture on whiteboard"
+              src="/src/assets/images/AWS_logo.jpeg"
+              alt="AWS Student Builder Group community logo"
               className="w-full h-full object-cover"
             />
           </div>

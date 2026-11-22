@@ -7,9 +7,16 @@ interface ResilientImageProps {
   alt: string;
   className?: string;
   fallbackTitle?: string;
+  loading?: 'lazy' | 'eager';
 }
 
-export function ResilientImage({ src, alt, className = '', fallbackTitle }: ResilientImageProps) {
+export function ResilientImage({
+  src,
+  alt,
+  className = '',
+  fallbackTitle,
+  loading = 'lazy',
+}: ResilientImageProps) {
   const [failed, setFailed] = useState(false);
   const resolved = resolveMediaUrl(src);
 
@@ -32,7 +39,10 @@ export function ResilientImage({ src, alt, className = '', fallbackTitle }: Resi
     <img
       src={resolved}
       alt={alt}
-      loading="lazy"
+      loading={loading}
+      decoding="async"
+      width="1600"
+      height="900"
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}
       className={className}

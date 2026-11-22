@@ -9,6 +9,7 @@ import { ResilientImage } from '../components/ResilientImage';
 import { EventCard } from '../components/EventCard';
 import { RichContent } from '../components/RichContent';
 import { ErrorBanner } from '../components/StateFeedback';
+import { absoluteMediaUrl, plainText } from '../lib/seo';
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -93,7 +94,38 @@ export function EventDetailPage() {
 
   return (
     <>
-      <SeoHead title={event.title} description={event.description.slice(0, 155)} />
+      <SeoHead
+        title={`${event.title} | AWS Student Meetup Punjab`}
+        description={plainText(event.description)}
+        canonicalPath={`/events/${event.slug || event.id}`}
+        image={event.image_url ? absoluteMediaUrl(event.image_url) : undefined}
+        type="article"
+        breadcrumbs={[
+          { name: 'Home', item: '/' },
+          { name: 'Events', item: '/events' },
+          { name: event.title, item: `/events/${event.slug || event.id}` },
+        ]}
+        structuredData={{
+          '@type': 'Event',
+          name: event.title,
+          description: plainText(event.description, 500),
+          startDate: event.event_date,
+          eventStatus: 'https://schema.org/EventScheduled',
+          eventAttendanceMode: /online|virtual|remote/i.test(event.location)
+            ? 'https://schema.org/OnlineEventAttendanceMode'
+            : 'https://schema.org/OfflineEventAttendanceMode',
+          location: /online|virtual|remote/i.test(event.location)
+            ? { '@type': 'VirtualLocation', url: 'https://aws-student-builder-group-tau.vercel.app/events' }
+            : { '@type': 'Place', name: event.location, address: event.location },
+          organizer: {
+            '@type': 'Organization',
+            name: 'AWS Student Builder Group',
+            url: 'https://aws-student-builder-group-tau.vercel.app/',
+          },
+          ...(event.image_url ? { image: absoluteMediaUrl(event.image_url) } : {}),
+          url: `https://aws-student-builder-group-tau.vercel.app/events/${event.slug || event.id}`,
+        }}
+      />
 
       <motion.article
         initial={{ opacity: 0, y: 12 }}

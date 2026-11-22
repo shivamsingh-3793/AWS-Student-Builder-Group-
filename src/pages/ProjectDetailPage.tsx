@@ -8,6 +8,7 @@ import { SeoHead } from '../components/SeoHead';
 import { ResilientImage } from '../components/ResilientImage';
 import { ProjectCard } from '../components/ProjectCard';
 import { ErrorBanner } from '../components/StateFeedback';
+import { absoluteMediaUrl, plainText, slugify } from '../lib/seo';
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +22,8 @@ export function ProjectDetailPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await projectsApi.get(id);
+      const numericId = id.match(/-(\d+)$/)?.[1] || id;
+      const res = await projectsApi.get(numericId);
       setProject(res.project);
       setRelated(res.related);
     } catch (err) {
@@ -63,7 +65,31 @@ export function ProjectDetailPage() {
 
   return (
     <>
-      <SeoHead title={project.title} description={project.description.slice(0, 155)} />
+      <SeoHead
+        title={`${project.title} | AWS Student Project`}
+        description={plainText(project.description)}
+        canonicalPath={`/projects/${slugify(project.title)}-${project.id}`}
+        image={project.image_url ? absoluteMediaUrl(project.image_url) : undefined}
+        type="article"
+        breadcrumbs={[
+          { name: 'Home', item: '/' },
+          { name: 'Projects', item: '/projects' },
+          { name: project.title, item: `/projects/${slugify(project.title)}-${project.id}` },
+        ]}
+        structuredData={{
+          '@type': 'CreativeWork',
+          name: project.title,
+          description: plainText(project.description, 500),
+          keywords: project.tech_stack,
+          url: `https://aws-student-builder-group-tau.vercel.app/projects/${slugify(project.title)}-${project.id}`,
+          creator: {
+            '@type': 'Organization',
+            name: 'AWS Student Builder Group',
+          },
+          ...(project.image_url ? { image: absoluteMediaUrl(project.image_url) } : {}),
+          ...(project.project_url ? { sameAs: project.project_url } : {}),
+        }}
+      />
 
       <motion.article
         initial={{ opacity: 0, y: 12 }}

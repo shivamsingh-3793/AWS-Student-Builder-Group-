@@ -16,12 +16,11 @@ export function textField(
   value: unknown,
   field: string,
   maxLength: number,
-  options: { required?: boolean; allowEmpty?: boolean } = {},
+  options: { required?: boolean; allowEmpty?: boolean; preserveWhitespace?: boolean } = {},
 ): string {
   if (typeof value !== 'string') throw new InputValidationError(`${field} must be text.`);
-  const text = value.trim();
-  if (options.required && !text) throw new InputValidationError(`${field} is required.`);
-  if (!options.allowEmpty && !text && options.required) throw new InputValidationError(`${field} is required.`);
+  const text = options.preserveWhitespace ? value : value.trim();
+  if (options.required && !text.trim()) throw new InputValidationError(`${field} is required.`);
   if (text.length > maxLength) throw new InputValidationError(`${field} is too long.`);
   if (/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(text)) {
     throw new InputValidationError(`${field} contains unsupported control characters.`);

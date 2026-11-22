@@ -7,7 +7,8 @@ import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 import { requireAuth } from './backend/middleware/auth.ts';
 import { uploadImage, UPLOADS_DIR, UploadValidationError } from './backend/middleware/upload.ts';
-import { asyncRoute, verifySupabaseConnection } from './backend/supabase.ts';
+import { asyncRoute, verifySupabaseConnection, supabase } from './backend/supabase.ts';
+import { slugify } from './backend/slugify.ts';
 import { uploadPublicImage, type MediaScope } from './backend/storage.ts';
 import { corsPolicy, securityHeaders } from './backend/middleware/security.ts';
 import { uploadRateLimit } from './backend/middleware/rateLimit.ts';
@@ -104,6 +105,38 @@ async function startServer() {
   app.use('/api/team', teamRoutes);
   app.use('/api/stats', statsRoutes);
   app.use('/api/community', communityRoutes);
+
+  app.get('/sitemap.xml', asyncRoute(async (_req, res) => {
+    const origin = 'https://aws-student-builder-group-tau.vercel.app';
+    const [events, posts, projects] = await Promise.all([
+      supabase.from('events').select('id,slug').eq('published', true),
+      supabase.from('posts').select('slug').eq('published', true),
+      supabase.from('projects').select('id,title').eq('published', true),
+    ]);
+    for (const result of [events, posts, projects]) {
+      if (result.error) throw new Error('Unable to generate the sitemap.');
+    }
+
+    const urls = [
+      '/', '/about', '/team', '/events', '/projects', '/blog', '/gallery', '/contact',
+      ...(events.data || []).map((item: { id: number; slug: string }) =>
+        `/events/${item.slug || item.id}`
+      ),
+      ...(posts.data || []).map((item: { slug: string }) => `/blog/${item.slug}`),
+      ...(projects.data || []).map((item: { id: number; title: string }) =>
+        `/projects/${slugify(item.title)}-${item.id}`
+      ),
+    ];
+    const xml = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+      ...urls.map((url) => `  <url><loc>${origin}${url}</loc></url>`),
+      '</urlset>',
+    ].join('\n');
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(xml);
+  }));
 
   app.use('/api', (_req, res) => {
     res.status(404).json({ error: 'API route not found.' });

@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { authApi, communityApi, configApi, statsApi } from '../../lib/api';
-import type { CommunityStats, SubmissionItem } from '../../types';
+import { authApi, configApi, statsApi } from '../../lib/api';
+import type { CommunityStats } from '../../types';
 import { SeoHead } from '../../components/SeoHead';
 import { ErrorBanner } from '../../components/StateFeedback';
+import { SubmissionInbox } from './SubmissionInbox';
 
 type CommunityStatsDraft = Record<keyof CommunityStats, string>;
 
@@ -17,7 +18,6 @@ function createStatsDraft(stats: CommunityStats | null): CommunityStatsDraft {
 
 export function AdminSettings() {
   const [stats, setStats] = useState<CommunityStatsDraft>(() => createStatsDraft(null));
-  const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [toast, setToast] = useState('');
@@ -29,9 +29,8 @@ export function AdminSettings() {
   const load = useCallback(async () => {
     setError('');
     try {
-      const [stRes, subRes] = await Promise.all([statsApi.get(), communityApi.submissions()]);
+      const stRes = await statsApi.get();
       setStats(createStatsDraft(stRes.community));
-      setSubmissions(subRes.submissions);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load settings.');
     }
@@ -221,45 +220,7 @@ export function AdminSettings() {
           </form>
         </div>
 
-        {/* Community Submissions */}
-        <div className="border border-[#151B24]/12 dark:border-white/12 bg-white dark:bg-[#1A222D] p-6 space-y-4">
-          <h2 className="font-display text-lg font-bold">Recent Community Applications & RSVPs</h2>
-          {submissions.length === 0 ? (
-            <p className="text-sm text-[#475569] dark:text-slate-400">No submissions recorded yet.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-[#151B24]/12 dark:border-white/12 font-mono text-xs uppercase text-[#475569] dark:text-slate-400">
-                    <th className="py-2.5 px-3">Type</th>
-                    <th className="py-2.5 px-3">Name</th>
-                    <th className="py-2.5 px-3">Email</th>
-                    <th className="py-2.5 px-3">Details</th>
-                    <th className="py-2.5 px-3">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#151B24]/10 dark:divide-white/10">
-                  {submissions.map((sub) => (
-                    <tr key={sub.id}>
-                      <td className="py-2.5 px-3 font-mono text-xs text-[#008F52] dark:text-[#00E582]">
-                        {sub.kind}
-                      </td>
-                      <td className="py-2.5 px-3 font-medium">{sub.name}</td>
-                      <td className="py-2.5 px-3 font-mono text-xs">{sub.email}</td>
-                      <td className="py-2.5 px-3 text-xs text-[#475569] dark:text-slate-400 max-w-md truncate">
-                        {sub.event_title ? `${sub.event_title} · ` : ''}
-                        {sub.role} {sub.track ? `(${sub.track})` : ''} {sub.message}
-                      </td>
-                      <td className="py-2.5 px-3 font-mono text-xs tabular-nums">
-                        {sub.created_at.slice(0, 10)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <SubmissionInbox />
       </div>
     </>
   );

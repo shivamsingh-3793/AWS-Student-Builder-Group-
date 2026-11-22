@@ -22,6 +22,8 @@ export function BrandLogo({ inverted = false }: { inverted?: boolean }) {
       <img
         src={brandLogo}
         alt="AWS Student Builder Group"
+        width="44"
+        height="44"
         className="h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-lg object-cover"
       />
       <span className="flex flex-col leading-none">

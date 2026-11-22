@@ -31,8 +31,9 @@ export function ProjectsPage() {
   return (
     <>
       <SeoHead
-        title="Community Projects"
-        description="Open-source AWS architectures, telemetry tools, and serverless platforms engineered by AWS Student Builder Group."
+        title="AWS Student Projects | AWS Builder Community Punjab"
+        description="Explore AWS cloud projects, student-built architectures and open-source tools created by the AWS Student Builder Group."
+        canonicalPath="/projects"
       />
 
       <section className="pt-32 pb-16 bg-[#151B24] text-white blueprint-grid border-b border-white/10">

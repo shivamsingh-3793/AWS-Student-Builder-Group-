@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import type { ProjectItem } from '../types';
 import { ResilientImage } from './ResilientImage';
+import { slugify } from '../lib/seo';
 
 export function ProjectCard({
   project,
@@ -25,7 +26,7 @@ export function ProjectCard({
       }`}
     >
       <Link
-        to={`/projects/${project.id}`}
+        to={`/projects/${slugify(project.title)}-${project.id}`}
         className={`block overflow-hidden bg-[#151B24] relative ${
           featured ? 'aspect-[16/9]' : 'aspect-[4/3]'
         }`}
@@ -48,7 +49,7 @@ export function ProjectCard({
             {project.tech_stack}
           </p>
 
-          <Link to={`/projects/${project.id}`} className="block mt-2.5">
+          <Link to={`/projects/${slugify(project.title)}-${project.id}`} className="block mt-2.5">
             <h3 className="font-display text-2xl font-bold tracking-tight text-[#151B24] dark:text-white group-hover:text-[#008F52] dark:group-hover:text-[#00E582] transition-colors">
               {project.title}
             </h3>
@@ -73,7 +74,7 @@ export function ProjectCard({
               </a>
             )}
             <Link
-              to={`/projects/${project.id}`}
+              to={`/projects/${slugify(project.title)}-${project.id}`}
               className="inline-flex items-center gap-1 text-sm font-medium text-[#475569] dark:text-slate-300 hover:text-[#008F52] dark:hover:text-[#00E582] transition-colors whitespace-nowrap"
             >
               <span>Architecture</span>

@@ -9,6 +9,7 @@ import { ResilientImage } from '../components/ResilientImage';
 import { RichContent } from '../components/RichContent';
 import { PostCard } from '../components/PostCard';
 import { ErrorBanner } from '../components/StateFeedback';
+import { absoluteMediaUrl, plainText } from '../lib/seo';
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -66,7 +67,40 @@ export function BlogPostPage() {
 
   return (
     <>
-      <SeoHead title={post.title} description={post.excerpt} />
+      <SeoHead
+        title={`${post.title} | AWS Student Builder Blog`}
+        description={plainText(post.excerpt || post.content)}
+        canonicalPath={`/blog/${post.slug}`}
+        image={post.image_url ? absoluteMediaUrl(post.image_url) : undefined}
+        type="article"
+        breadcrumbs={[
+          { name: 'Home', item: '/' },
+          { name: 'Blog', item: '/blog' },
+          { name: post.title, item: `/blog/${post.slug}` },
+        ]}
+        structuredData={{
+          '@type': 'Article',
+          headline: post.title,
+          description: plainText(post.excerpt || post.content, 500),
+          articleSection: post.category,
+          datePublished: post.created_at,
+          dateModified: post.updated_at,
+          author: {
+            '@type': 'Organization',
+            name: 'AWS Student Builder Group',
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'AWS Student Builder Group',
+            logo: {
+              '@type': 'ImageObject',
+              url: 'https://aws-student-builder-group-tau.vercel.app/src/assets/images/AWS_logo.jpeg',
+            },
+          },
+          mainEntityOfPage: `https://aws-student-builder-group-tau.vercel.app/blog/${post.slug}`,
+          ...(post.image_url ? { image: absoluteMediaUrl(post.image_url) } : {}),
+        }}
+      />
 
       <motion.article
         initial={{ opacity: 0, y: 12 }}

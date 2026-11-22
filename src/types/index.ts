@@ -102,6 +102,28 @@ export interface SubmissionItem {
   event_id: number | null;
   event_title?: string | null;
   created_at: string;
+  status: SubmissionStatus;
+}
+
+export type SubmissionStatus = 'new' | 'read' | 'reviewed';
+export type SubmissionKind = 'join' | 'event_rsvp' | 'contact';
+export type SubmissionSort = 'newest' | 'oldest';
+
+export interface SubmissionQuery {
+  page?: number;
+  pageSize?: number;
+  sort?: SubmissionSort;
+  kind?: SubmissionKind;
+  status?: SubmissionStatus;
+  search?: string;
+}
+
+export interface SubmissionPage {
+  submissions: SubmissionItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
 }
 
 export interface AdminUser {

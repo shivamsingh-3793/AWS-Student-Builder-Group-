@@ -59,8 +59,9 @@ export function EventsPage() {
   return (
     <>
       <SeoHead
-        title="Events & Workshops"
-        description="Explore upcoming AWS workshops, cloud engineering summits, and 24-hour builder hackathons."
+        title="AWS Events & Meetups | AWS Student Builder Group"
+        description="Explore AWS events, workshops, meetups and student hackathons by the AWS Student Builder Group in Punjab and Chandigarh."
+        canonicalPath="/events"
       />
 
       {/* Hero Section with Ambient Glow and Blueprint Grid */}

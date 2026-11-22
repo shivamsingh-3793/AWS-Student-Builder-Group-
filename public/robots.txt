@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://aws-student-builder-group-tau.vercel.app/sitemap.xml

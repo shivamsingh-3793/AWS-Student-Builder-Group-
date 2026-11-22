@@ -7,6 +7,9 @@ import type {
   ProjectItem,
   StatsResponse,
   SubmissionItem,
+  SubmissionPage,
+  SubmissionQuery,
+  SubmissionStatus,
   TeamCategory,
   TeamMember,
 } from '../types';
@@ -265,5 +268,22 @@ export const communityApi = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
-  submissions: () => request<{ submissions: SubmissionItem[] }>('/api/community/submissions'),
+  submissions: (query: SubmissionQuery) => {
+    const params = new URLSearchParams();
+    if (query.page !== undefined) params.set('page', String(query.page));
+    if (query.pageSize !== undefined) params.set('pageSize', String(query.pageSize));
+    if (query.sort) params.set('sort', query.sort);
+    if (query.kind) params.set('kind', query.kind);
+    if (query.status) params.set('status', query.status);
+    if (query.search) params.set('search', query.search);
+    return request<SubmissionPage>(`/api/community/submissions?${params}`);
+  },
+  updateSubmissionStatus: (id: number, status: SubmissionStatus) =>
+    request<{ submission: Pick<SubmissionItem, 'id' | 'status'>; message: string }>(
+      `/api/community/submissions/${id}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      },
+    ),
 };

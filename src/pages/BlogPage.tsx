@@ -56,8 +56,9 @@ export function BlogPage() {
   return (
     <>
       <SeoHead
-        title="Engineering Blog"
-        description="Read engineering articles, AWS benchmarks, and cloud architecture guides written by AWS Student Builder Group."
+        title="AWS Cloud & Student Builder Blog | AWS Student Builder Group"
+        description="Read AWS cloud guides, architecture lessons and student engineering stories from the AWS Student Builder Group community."
+        canonicalPath="/blog"
       />
 
       {/* ================= HERO ================= */}

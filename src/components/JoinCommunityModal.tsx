@@ -41,8 +41,6 @@ const INITIAL_FORM = {
   message: '',
 };
 
-const MESSAGE_MAX = 500;
-
 const FOCUSABLE =
   'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
@@ -131,7 +129,7 @@ export function JoinCommunityModal({ open, onClose }: JoinCommunityModalProps) {
         email: form.email.trim(),
         role: form.role,
         track: form.track,
-        message: form.message.trim(),
+        message: form.message,
       });
       setSuccess(res?.message || "Thanks for applying. We'll reply by email.");
       setForm(INITIAL_FORM);
@@ -361,13 +359,12 @@ export function JoinCommunityModal({ open, onClose }: JoinCommunityModalProps) {
                           <span className="font-normal text-[#64748B] dark:text-slate-500">(optional)</span>
                         </label>
                         <span className="text-xs tabular-nums text-[#64748B] dark:text-slate-500 mb-1.5">
-                          {form.message.length}/{MESSAGE_MAX}
+                          {form.message.length.toLocaleString()} characters
                         </span>
                       </div>
                       <textarea
                         id={`${uid}-message`}
                         rows={3}
-                        maxLength={MESSAGE_MAX}
                         value={form.message}
                         onChange={setField('message')}
                         placeholder="A project idea or cloud topic you want to explore"
