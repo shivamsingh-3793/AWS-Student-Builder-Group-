@@ -7,7 +7,7 @@ import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
   const rootDir = fileURLToPath(new URL('.', import.meta.url));
-  const env = loadEnv(mode, rootDir, '');
+  const env = loadEnv(mode, rootDir, ['VITE_', 'NEXT_PUBLIC_']);
   const configuredApiBase =
     process.env.VITE_API_URL ||
     env.VITE_API_URL ||
@@ -59,86 +59,99 @@ export default defineConfig(({ mode }) => {
             return;
           }
 
-          const apiUrl = new URL(apiBase);
-          if (
-            !['http:', 'https:'].includes(apiUrl.protocol) ||
-            apiUrl.username ||
-            apiUrl.password ||
-            apiUrl.search ||
-            apiUrl.hash
-          ) {
-            throw new Error('VITE_API_URL must be a public HTTP(S) API base URL without credentials or query parameters.');
+          let detailUrls: string[] = [];
+          try {
+            const apiUrl = new URL(apiBase);
+            if (
+              !['http:', 'https:'].includes(apiUrl.protocol) ||
+              apiUrl.username ||
+              apiUrl.password ||
+              apiUrl.search ||
+              apiUrl.hash
+            ) {
+              throw new Error('Invalid public API URL.');
+            }
+
+            const fetchCollection = async (pathName: string, key: string): Promise<unknown[]> => {
+              const response = await fetch(`${apiBase}${pathName}`, {
+                signal: AbortSignal.timeout(4000),
+                headers: { Accept: 'application/json' },
+              });
+              if (!response.ok) {
+                throw new Error(`API returned HTTP ${response.status}.`);
+              }
+              const payload: unknown = await response.json();
+              if (
+                !payload ||
+                typeof payload !== 'object' ||
+                !(key in payload) ||
+                !Array.isArray((payload as Record<string, unknown>)[key])
+              ) {
+                throw new Error('API returned an invalid response.');
+              }
+              return (payload as Record<string, unknown[]>)[key];
+            };
+
+            const [events, posts, projects] = await Promise.all([
+              fetchCollection('/api/events', 'events'),
+              fetchCollection('/api/posts', 'posts'),
+              fetchCollection('/api/projects', 'projects'),
+            ]);
+            const isRecord = (value: unknown): value is Record<string, unknown> =>
+              value !== null && typeof value === 'object' && !Array.isArray(value);
+            const isValidId = (value: unknown): value is number =>
+              typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
+            const isValidSlug = (value: unknown): value is string =>
+              typeof value === 'string' && /^[a-z0-9][a-z0-9-]{0,199}$/.test(value);
+
+            const eventUrls = events.flatMap((item) => {
+              if (!isRecord(item) || item.published !== true || !isValidId(item.id)) return [];
+              return [`/events/${isValidSlug(item.slug) ? item.slug : item.id}`];
+            });
+            const postUrls = posts.flatMap((item) => {
+              if (!isRecord(item) || item.published !== true || !isValidSlug(item.slug)) return [];
+              return [`/blog/${item.slug}`];
+            });
+            const projectUrls = projects.flatMap((item) => {
+              if (
+                !isRecord(item) ||
+                item.published !== true ||
+                !isValidId(item.id) ||
+                typeof item.title !== 'string' ||
+                !item.title.trim()
+              ) {
+                return [];
+              }
+              const slug = item.title.toLowerCase().trim()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+              return slug ? [`/projects/${slug}-${item.id}`] : [];
+            });
+
+            detailUrls = [...new Set([...eventUrls, ...postUrls, ...projectUrls])];
+          } catch {
+            console.warn(
+              '[sitemap] CMS API unavailable, timed out, or returned invalid data; using static routes only.',
+            );
           }
 
-          const fetchCollection = async <T,>(pathName: string, key: string): Promise<T[]> => {
-            const response = await fetch(`${apiBase}${pathName}`, {
-              signal: AbortSignal.timeout(15000),
-              headers: { Accept: 'application/json' },
-            });
-            if (!response.ok) {
-              throw new Error(`CMS sitemap request failed with status ${response.status}.`);
-            }
-            const payload: unknown = await response.json();
-            if (
-              !payload ||
-              typeof payload !== 'object' ||
-              !(key in payload) ||
-              !Array.isArray((payload as Record<string, unknown>)[key])
-            ) {
-              throw new Error(`CMS sitemap response for ${pathName} was invalid.`);
-            }
-            return (payload as Record<string, T[]>)[key];
-          };
-
-          try {
-            const [events, posts, projects] = await Promise.all([
-              fetchCollection<{ id: number; slug?: string }>('/api/events', 'events'),
-              fetchCollection<{ slug: string }>('/api/posts', 'posts'),
-              fetchCollection<{ id: number; title: string }>('/api/projects', 'projects'),
-            ]);
-            const validId = (id: number) => Number.isSafeInteger(id) && id > 0;
-            const eventUrls = events.map((event) => {
-              if (!validId(event.id) || (event.slug && !/^[a-z0-9][a-z0-9-]{0,199}$/.test(event.slug))) {
-                throw new Error('CMS returned an invalid published event for the sitemap.');
-              }
-              return `/events/${event.slug || event.id}`;
-            });
-            const postUrls = posts.map((post) => {
-              if (!/^[a-z0-9][a-z0-9-]{0,199}$/.test(post.slug)) {
-                throw new Error('CMS returned an invalid published post for the sitemap.');
-              }
-              return `/blog/${post.slug}`;
-            });
-            const projectUrls = projects.map((project) => {
-              if (!validId(project.id) || typeof project.title !== 'string' || !project.title.trim()) {
-                throw new Error('CMS returned an invalid published project for the sitemap.');
-              }
-              const slug = project.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-              return `/projects/${slug}-${project.id}`;
-            });
-
-            const content = fs.readFileSync(sitemapPath, 'utf8');
-            if (!content.includes('</urlset>')) {
-              throw new Error('The static sitemap XML is malformed.');
-            }
-            const existingUrls = new Set(
-              Array.from(content.matchAll(/<loc>(.*?)<\/loc>/g), (match) => match[1]),
-            );
-            const detailUrls = [...new Set([...eventUrls, ...postUrls, ...projectUrls])]
-              .map((url) => new URL(url, origin).href)
-              .filter((url) => !existingUrls.has(url));
-            const additions = detailUrls.map((url) => `  <url><loc>${url}</loc></url>`).join('\n');
-            fs.writeFileSync(
-              sitemapPath,
-              content.replace('</urlset>', `${additions ? `${additions}\n` : ''}</urlset>`),
-            );
-            console.info(`Added ${detailUrls.length} published CMS detail URLs to dist/sitemap.xml.`);
-          } catch (error) {
-            throw new Error(
-              `Unable to include published CMS URLs in dist/sitemap.xml: ${
-                error instanceof Error ? error.message : 'Unknown API error.'
-              }`,
-            );
+          const content = fs.readFileSync(sitemapPath, 'utf8');
+          if (!content.includes('</urlset>')) {
+            throw new Error('The static sitemap XML is malformed.');
+          }
+          const existingUrls = new Set(
+            Array.from(content.matchAll(/<loc>(.*?)<\/loc>/g), (match) => match[1]),
+          );
+          const originUrls = detailUrls
+            .map((url) => new URL(url, origin).href)
+            .filter((url) => !existingUrls.has(url));
+          const additions = originUrls.map((url) => `  <url><loc>${url}</loc></url>`).join('\n');
+          fs.writeFileSync(
+            sitemapPath,
+            content.replace('</urlset>', `${additions ? `${additions}\n` : ''}</urlset>`),
+          );
+          if (originUrls.length) {
+            console.info(`Added ${originUrls.length} published CMS detail URLs to dist/sitemap.xml.`);
           }
         },
       },
